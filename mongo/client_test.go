@@ -1,17 +1,5 @@
-/*
- Copyright 2020 The Qmgo Authors.
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-     http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-*/
 
-package qmgo
+package mongo
 
 import (
 	"context"
@@ -23,10 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func initClient(col string) *QmgoClient {
+func initClient(col string) *MgClient {
 	cfg := Config{
 		Uri:      "mongodb://localhost:27017",
-		Database: "qmgotest",
+		Database: "mgotest",
 		Coll:     col,
 	}
 	var cTimeout int64 = 0
@@ -66,7 +54,7 @@ func TestQmgoClient(t *testing.T) {
 
 	cfg = Config{
 		Uri:              "mongodb://localhost:27017",
-		Database:         "qmgotest",
+		Database:         "mgotest",
 		Coll:             "testopen",
 		ConnectTimeoutMS: &timeout,
 		MaxPoolSize:      &maxPoolSize,
@@ -76,7 +64,7 @@ func TestQmgoClient(t *testing.T) {
 
 	cli, err := Open(context.Background(), &cfg)
 	ast.NoError(err)
-	ast.Equal(cli.GetDatabaseName(), "qmgotest")
+	ast.Equal(cli.GetDatabaseName(), "mgotest")
 	ast.Equal(cli.GetCollectionName(), "testopen")
 
 	err = cli.Ping(5)
@@ -99,7 +87,7 @@ func TestQmgoClient(t *testing.T) {
 	// primary mode with max stalenessMS, error
 	cfg = Config{
 		Uri:              "mongodb://localhost:27017",
-		Database:         "qmgotest",
+		Database:         "mgotest",
 		Coll:             "testopen",
 		ConnectTimeoutMS: &timeout,
 		MaxPoolSize:      &maxPoolSize,
@@ -126,7 +114,7 @@ func TestClient(t *testing.T) {
 
 	c, err := NewClient(context.Background(), cfg)
 	ast.Equal(nil, err)
-	coll := c.Database("qmgotest").Collection("testopen")
+	coll := c.Database("mgotest").Collection("testopen")
 
 	res, err := coll.InsertOne(context.Background(), bson.D{{Key: "x", Value: 1}})
 	ast.NoError(err)
@@ -139,7 +127,7 @@ func TestClient_ServerVersion(t *testing.T) {
 
 	cfg := &Config{
 		Uri:      "mongodb://localhost:27017",
-		Database: "qmgotest",
+		Database: "mgotest",
 		Coll:     "transaction",
 	}
 
@@ -158,7 +146,7 @@ func TestClient_newAuth(t *testing.T) {
 	auth := Credential{
 		AuthMechanism: "PLAIN",
 		AuthSource:    "PLAIN",
-		Username:      "qmgo",
+		Username:      "mgo",
 		Password:      "123",
 		PasswordSet:   false,
 	}
@@ -183,7 +171,7 @@ func TestClient_newAuth(t *testing.T) {
 	auth = Credential{
 		AuthMechanism: "PLAIN",
 		AuthSource:    "PLAIN",
-		Username:      "qmgo",
+		Username:      "mgo",
 		Password:      "12:3",
 		PasswordSet:   false,
 	}
@@ -193,7 +181,7 @@ func TestClient_newAuth(t *testing.T) {
 	auth = Credential{
 		AuthMechanism: "PLAIN",
 		AuthSource:    "PLAIN",
-		Username:      "qmgo",
+		Username:      "mgo",
 		Password:      "1/23",
 		PasswordSet:   false,
 	}
@@ -203,7 +191,7 @@ func TestClient_newAuth(t *testing.T) {
 	auth = Credential{
 		AuthMechanism: "PLAIN",
 		AuthSource:    "PLAIN",
-		Username:      "qmgo",
+		Username:      "mgo",
 		Password:      "1%3",
 		PasswordSet:   false,
 	}
