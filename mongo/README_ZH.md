@@ -1,10 +1,10 @@
-# Qmgo
+# MgClient
 
-`Qmgo` 是一款`Go`语言的`MongoDB` `driver`，它基于[MongoDB 官方 driver](https://github.com/mongodb/mongo-go-driver) 开发实现，同时使用更易用的接口设计，比如参考[mgo](https://github.com/go-mgo/mgo) （比如`mgo`的链式调用）。
+`MgClient` 是一款`Go`语言的`MongoDB` `driver`，它基于[MongoDB 官方 driver](https://github.com/mongodb/mongo-go-driver) 开发实现，同时使用更易用的接口设计，比如参考[mgo](https://github.com/go-mgo/mgo) （比如`mgo`的链式调用）。
 
-- `Qmgo`让您以更优雅的姿势使用`MongoDB`的新特性。
+- `MgClient`让您以更优雅的姿势使用`MongoDB`的新特性。
 
-- `Qmgo`是从`mgo`迁移到新`MongoDB driver`的第一选择，对代码的改动影响最小。
+- `MgClient`是从`mgo`迁移到新`MongoDB driver`的第一选择，对代码的改动影响最小。
 
 ## 要求
 
@@ -47,7 +47,7 @@ go get github.com/haogooder/gospanner/mongo
     )
     
     ctx := context.Background()
-    client, err := qmgo.NewClient(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017"})
+    client, err := MgClient.NewClient(ctx, &MgClient.Config{Uri: "mongodb://localhost:27017"})
     db := client.Database("class")
     coll := db.Collection("user")
     
@@ -56,7 +56,7 @@ go get github.com/haogooder/gospanner/mongo
     如果你的连接是指向固定的 database 和 collection，我们推荐使用下面的更方便的方法初始化连接，后续操作都基于`cli`而不用再关心 database 和 collection
     
     ```go
-    cli, err := qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "class", Coll: "user"})
+    cli, err := MgClient.Open(ctx, &MgClient.Config{Uri: "mongodb://localhost:27017", Database: "class", Coll: "user"})
     ```
     
     **_后面都会基于`cli`来举例，如果你使用第一种传统的方式进行初始化，根据上下文，将`cli`替换成`client`、`db` 或 `coll`即可_**
@@ -223,7 +223,7 @@ go get github.com/haogooder/gospanner/mongo
 
 - Hooks
 
-    Qmgo 灵活的 hooks:
+    MgClient 灵活的 hooks:
 
     ```go
     type User struct {
@@ -248,11 +248,11 @@ go get github.com/haogooder/gospanner/mongo
 
 - 自动化更新fields
 
-    Qmgo支持2种方式来自动化更新特定的字段
+    MgClient支持2种方式来自动化更新特定的字段
 
     - 默认 fields
     
-    在文档结构体里注入 `field.DefaultField`, `Qmgo` 会自动在更新和插入操作时更新 `createAt`、`updateAt` and `_id` field的值.
+    在文档结构体里注入 `field.DefaultField`, `MgClient` 会自动在更新和插入操作时更新 `createAt`、`updateAt` and `_id` field的值.
     
     ````go
     type User struct {
@@ -269,7 +269,7 @@ go get github.com/haogooder/gospanner/mongo
 
     - Custom fields
     
-    可以自定义field名, `Qmgo` 会自动在更新和插入操作时更新他们.
+    可以自定义field名, `MgClient` 会自动在更新和插入操作时更新他们.
 
     ```go
     type User struct {
@@ -302,7 +302,7 @@ go get github.com/haogooder/gospanner/mongo
     
     功能基于[go-playground/validator](https://github.com/go-playground/validator)实现。
     
-    所以`Qmgo`支持所有[go-playground/validator 的struct验证规则](https://github.com/go-playground/validator#usage-and-documentation)，比如：
+    所以`MgClient`支持所有[go-playground/validator 的struct验证规则](https://github.com/go-playground/validator#usage-and-documentation)，比如：
     ```go
     type User struct {
         FirstName string            `bson:"fname"`
@@ -327,17 +327,17 @@ go get github.com/haogooder/gospanner/mongo
     ```
     
     - 调用middleware包的Register方法，注入`Do`
-      Qmgo会在支持的[操作](operator/operate_type.go)执行前后调用`Do`
+      MgClient会在支持的[操作](operator/operate_type.go)执行前后调用`Do`
     ```go
     middleware.Register(Do)
     ```
     [Example](middleware/middleware_test.go)
     
-    Qmgo的hook、自动更新field和validation tags都基于plugin的方式实现
+    MgClient的hook、自动更新field和validation tags都基于plugin的方式实现
   
-## `qmgo` vs `go.mongodb.org/mongo-driver`
+## `MgClient` vs `go.mongodb.org/mongo-driver`
 
-下面我们举一个多文件查找、`sort`和`limit`的例子, 说明`qmgo`和`mgo`的相似，以及对`go.mongodb.org/mongo-driver`的改进
+下面我们举一个多文件查找、`sort`和`limit`的例子, 说明`MgClient`和`mgo`的相似，以及对`go.mongodb.org/mongo-driver`的改进
 
 官方`Driver`需要这样实现
 
@@ -355,10 +355,10 @@ cur, err := coll.Find(ctx, bson.M{"age": 6}, findOptions)
 cur.All(ctx, &batch)
 ```
 
-`Qmgo`和`mgo`更简单，而且实现相似：
+`MgClient`和`mgo`更简单，而且实现相似：
 
 ```go
-// qmgo
+// MgClient
 // find all 、sort and limit
 batch := []UserInfo{}
 cli.Find(ctx, bson.M{"age": 6}).Sort("weight").Limit(7).All(&batch)
@@ -368,17 +368,17 @@ cli.Find(ctx, bson.M{"age": 6}).Sort("weight").Limit(7).All(&batch)
 coll.Find(bson.M{"age": 6}).Sort("weight").Limit(7).All(&batch)
 ```
 
-## `Qmgo` vs `mgo`
+## `MgClient` vs `mgo`
 
-[Qmgo 和 Mgo 的差异](https://github.com/haogooder/gospanner/mongo/wiki/Differences-between-Qmgo-and-Mgo)
+[MgClient 和 Mgo 的差异](https://github.com/haogooder/gospanner/mongo/wiki/Differences-between-MgClient-and-Mgo)
 
 ## Contributing
 
-非常欢迎您对`Qmgo`的任何贡献，非常感谢您的帮助！
+非常欢迎您对`MgClient`的任何贡献，非常感谢您的帮助！
 
 
 ## 沟通交流:
 
-- 加入 [gitter room](https://gitter.im/qiniu/qmgo)
+- 加入 [gitter room](https://gitter.im/qiniu/MgClient)
 
-- 加入 [qmgo discussions](https://github.com/haogooder/gospanner/mongo/discussions)
+- 加入 [MgClient discussions](https://github.com/haogooder/gospanner/mongo/discussions)
